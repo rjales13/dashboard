@@ -8,7 +8,7 @@ export const InfoTemplate = async () => {
 
   try {
     posts = await fetchPosts();
-  } catch (err) {
+  } catch {
     error = "Unable to load posts. Please try again later.";
   }
 
