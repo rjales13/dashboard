@@ -1,0 +1,266 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Consultorio {
+  /// Campo gerado automaticamente pelo MongoDB
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  cobranca            String
+  nome                String
+  cep                 String
+  numero              String
+  email               String
+  complemento         String?
+  cep_entrega         String?
+  numero_entrega      String?
+  complemento_entrega String?
+  observacao          String?
+  telefones           String[]
+  dentistas           String[] @db.ObjectId
+  secretarias         String[] @db.ObjectId
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  @@map("consultorios")
+}
+
+model Dentista {
+  /// Campo gerado automaticamente pelo MongoDB
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome           String
+  cro            String
+  email          String
+  telefones      String[]
+  especialidades String[] @db.ObjectId
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  @@map("dentistas")
+}
+
+model Especialidade {
+  /// Campo gerado automaticamente pelo MongoDB
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("especialidades")
+}
+
+model Secretaria {
+  /// Campo gerado automaticamente pelo MongoDB
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome       String
+  email      String
+  telefones  String[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("secretarias")
+}
+
+model Funcionario {
+  /// Campo gerado automaticamente pelo MongoDB
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome            String
+  cep             String
+  numero          String
+  complemento     String?
+  email           String
+  rg              String
+  cpf             String
+  data_nascimento String
+  data_admissao   String
+  data_recisao    String?
+  observacao      String?
+  telefones       String[]
+  funcoes         String[] @db.ObjectId
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@map("funcionarios")
+}
+
+model Funcao {
+  /// Campo gerado automaticamente pelo MongoDB
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("funcoes")
+}
+
+model Servico {
+  /// Campo gerado automaticamente pelo MongoDB
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome           String
+  valor_sem_nota Int[]
+  valor_com_nota Int[]
+  valor_unicid   Int[]
+  valor_pinheros Int[]
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  @@map("servicos")
+}
+
+model Entrada {
+  /// Campo gerado automaticamente pelo MongoDB
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  consultorio String           @db.ObjectId
+  dentista    String           @db.ObjectId
+  paciente    String
+  observacao  String?
+  servicos    ServicoEntrada[]
+  created_at  DateTime         @default(now())
+  updated_at  DateTime         @updatedAt
+
+  @@map("entradas")
+}
+
+type ServicoEntrada {
+  idServicoEntrada String
+  servico          String    @db.ObjectId
+  valor            Int
+  desconto         Int
+  quantidade       Int
+  repeticao        Int
+  funcionario      String    @db.ObjectId
+  data_entrada     DateTime  @default(now())
+  data_previsao    DateTime
+  data_saida       DateTime?
+  roteiro          String?   @db.ObjectId
+  entregue         Boolean?
+  fechamento       String?   @db.ObjectId
+}
+
+model Roteiro {
+  /// Campo gerado automaticamente pelo MongoDB
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  data       String
+  entregue   Boolean?
+  observacao String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("roteiros")
+}
+
+model Fechamento {
+  /// Campo gerado automaticamente pelo MongoDB
+  id                    String                           @id @default(auto()) @map("_id") @db.ObjectId
+  fechado               Boolean                          @default(false)
+  data                  DateTime
+  adicional_consultorio AdicionalConsultorioFechamento[]
+  adicional_dentista    AdicionalDentistaFechamento[]
+  valor                 Int
+  observacao            String?
+  created_at            DateTime                         @default(now())
+  updated_at            DateTime                         @updatedAt
+
+  @@map("fechamento")
+}
+
+type AdicionalConsultorioFechamento {
+  idConsultorio String  @db.ObjectId
+  desconto      Int[]
+  observacao    String?
+}
+
+type AdicionalDentistaFechamento {
+  idDentista String  @db.ObjectId
+  desconto   Int[]
+  observacao String?
+}
+
+model Valores {
+  /// Campo gerado automaticamente pelo MongoDB
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  consultorio String   @db.ObjectId
+  dentista    String   @db.ObjectId
+  tipo        String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("valores")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  role          String    @default("user")
+  banned        Boolean   @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
+  accountId             String
+  providerId            String
+  userId                String    @db.ObjectId
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
