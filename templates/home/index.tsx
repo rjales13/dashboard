@@ -11,6 +11,7 @@ import { useEffect, useMemo, useState } from "react";
 import { TableList } from "./table";
 import { hasDigit } from "@/lib/utils/hasDigit";
 import { iTableList } from "@/models/tableList";
+import Link from "next/link";
 
 export const HomeTemplate = () => {
   const [discover, setDiscover] = useState<string>("Open");
@@ -152,6 +153,12 @@ export const HomeTemplate = () => {
         <ChartBarDefault chartData={chartData} />
         {posts.length > 0 && <TableList data={posts} />}
       </section>
+      <Link
+        href="/info"
+        className="text-blue-500 transition hover:opacity-70 flex justify-end text-lg font-bold"
+      >
+        to Info
+      </Link>
     </div>
   );
 };
